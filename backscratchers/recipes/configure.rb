@@ -19,9 +19,12 @@ node[:deploy].each do |application, deploy|
   end
 
   # Create various secret files.
+  # TODO @leo Figure out how to include the other Xero config files.
   #
   [:secrets,
-   :s3_credentials
+   :s3_credentials,
+   :insightly,
+   :xero
   ].each do |key|
   template "#{deploy[:deploy_to]}/shared/#{key.to_s}.yml" do
     source "#{key.to_s}.yml"
@@ -35,8 +38,8 @@ node[:deploy].each do |application, deploy|
     end
 
     variables {
-      "#{key}": deploy.fetch(key),
-      environment: deploy[:rails_env]
+      key => deploy.fetch(key),
+      :environment => deploy[:rails_env]
     }
 
     only_if do
