@@ -12,7 +12,7 @@ node[:deploy].each do |application, deploy|
 
   unless application == "backscratchers"
     Chef::Log.info "Skipping backscratchers::configure for #{application} as it is not the Backscratchers app"
-    #next
+    next
   end
   Chef::Log.info "Configuring Backscratchers application '#{application}'"
 
@@ -27,7 +27,13 @@ node[:deploy].each do |application, deploy|
   # Create various secret files.
   # TODO @leo Figure out how to include the other Xero config files.
   #
+  Chef::Log.info "Processing Backscratchers templates"
+  Chef::Log.info "deploy[:secrets].present? #{deploy[:secrets].present?}"
+  Chef::Log.info "File.directory?(\"\#{deploy[:deploy_to]}/shared/\") #{File.directory?("#{deploy[:deploy_to]}/shared/")}"
+  Chef::Log.info "platform?('ubuntu') #{platform?('ubuntu')}"
+  Chef::Log.info "variables #{{:vars => deploy.fetch(:secrets), :environment => deploy[:rails_env]}.inspect}"
   template "#{deploy[:deploy_to]}/shared/secrets.yml" do
+    Chef::Log.info "Processing template secrets.yml"
     source "secrets.yml.erb"
     mode 0660
     group deploy[:group]
@@ -49,7 +55,7 @@ node[:deploy].each do |application, deploy|
   # :xero
   #].each do |key|
   #  template "#{deploy[:deploy_to]}/shared/#{key.to_s}.yml" do
-  #    source "#{key.to_s}.yml"
+  #    source "#{key.to_s}.yml.erb"
   #    mode 0660
   #    group deploy[:group]
   #    if platform?('ubuntu')
@@ -58,7 +64,7 @@ node[:deploy].each do |application, deploy|
   #      owner 'apache'
   #    end
 
-  #    variables { vars: deploy.fetch(key), environment: deploy[:rails_env] }
+  #    variables(:vars => deploy.fetch(key), :environment => deploy[:rails_env])
 
   #    only_if do
   #      deploy[key].present? && File.directory?("#{deploy[:deploy_to]}/shared/")
