@@ -24,6 +24,14 @@ node[:deploy].each do |application, deploy|
     append true
   end
 
+  # Adjust permissions on directories that need to be writeable by the webapp/server.
+  # TODO @leo Should this go somewhere else? Maybe not. Doesn't seem like it should be needed per-deploy...
+  #
+  directory "#{deploy[:deploy_to]}/shared/log" do
+    mode 0770
+  end
+
+
   # Create various secret files.
   # TODO @leo Figure out how to include the other Xero config files.
   #
@@ -32,44 +40,39 @@ node[:deploy].each do |application, deploy|
   Chef::Log.info "File.directory?(\"\#{deploy[:deploy_to]}/shared/\") #{File.directory?("#{deploy[:deploy_to]}/shared/")}"
   Chef::Log.info "platform?('ubuntu') #{platform?('ubuntu')}"
   Chef::Log.info "variables #{{:vars => deploy.fetch(:secrets), :environment => deploy[:rails_env]}.inspect}"
-  template "#{deploy[:deploy_to]}/shared/secrets.yml" do
-    Chef::Log.info "Processing template secrets.yml"
-    source "secrets.yml.erb"
-    mode 0660
-    group deploy[:group]
-    if platform?('ubuntu')
-      owner 'www-data'
-    elsif platform?('amazon')
-      owner 'apache'
-    end
 
-    variables(:vars => deploy.fetch(:secrets), :environment => deploy[:rails_env])
+  #template "#{deploy[:deploy_to]}/shared/config/secrets.yml" do
+  #  Chef::Log.info "Processing template secrets.yml"
+  #  source "secrets.yml.erb"
+  #  mode 0660
+  #  user deploy[:user]
+  #  group deploy[:group]
 
-    only_if do
-      deploy[:secrets].present? && File.directory?("#{deploy[:deploy_to]}/shared/")
-    end
-  end
-  #[:secrets,
-  # :s3_credentials,
-  # :insightly,
-  # :xero
-  #].each do |key|
-  #  template "#{deploy[:deploy_to]}/shared/#{key.to_s}.yml" do
-  #    source "#{key.to_s}.yml.erb"
-  #    mode 0660
-  #    group deploy[:group]
-  #    if platform?('ubuntu')
-  #      owner 'www-data'
-  #    elsif platform?('amazon')
-  #      owner 'apache'
-  #    end
+  #  variables(:vars => deploy.fetch(:secrets), :environment => deploy[:rails_env])
 
-  #    variables(:vars => deploy.fetch(key), :environment => deploy[:rails_env])
-
-  #    only_if do
-  #      deploy[key].present? && File.directory?("#{deploy[:deploy_to]}/shared/")
-  #    end
+  #  only_if do
+  #    deploy[:secrets].present? && File.directory?("#{deploy[:deploy_to]}/shared/")
   #  end
   #end
+
+  [:s3_credentials,
+   :insightly,
+   :xero,
+   :secrets
+  ].each do |key|
+    template "#{deploy[:deploy_to]}/shared/config/#{key.to_s}.yml" do
+      Chef::Log.info "Processing template #{key.to_s}.yml"
+      source "#{key.to_s}.yml.erb"
+      mode 0660
+      user deploy[:user]
+      group deploy[:group]
+
+      variables(:vars => deploy.fetch(key), :environment => deploy[:rails_env])
+
+      only_if do
+        deploy[key].present? && File.directory?("#{deploy[:deploy_to]}/shared/")
+      end
+    end
+  end
 
 end
