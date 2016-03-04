@@ -4,9 +4,15 @@
 #
 node[:deploy].each do |application, deploy|
 
-  unless deploy.has_key
-    Chef::Log.debug "Skipping backscratchers::configure for #{application} as it is not the Backscratchers app"
-    next
+  Chef::Log.info "Running backscratchers::configure for #{application}"
+  deploy.each do |key, value|
+    Chef::Log.info "     #{key}: #{value}"
+  end
+  Chef::Log.info application.inspect
+
+  unless application == "backscratchers"
+    Chef::Log.info "Skipping backscratchers::configure for #{application} as it is not the Backscratchers app"
+    #next
   end
   Chef::Log.info "Configuring Backscratchers application '#{application}'"
 
@@ -21,14 +27,8 @@ node[:deploy].each do |application, deploy|
   # Create various secret files.
   # TODO @leo Figure out how to include the other Xero config files.
   #
-  [:secrets,
-   :s3_credentials,
-   :insightly,
-   :xero
-  ].each do |key|
-  template "#{deploy[:deploy_to]}/shared/#{key.to_s}.yml" do
-    source "#{key.to_s}.yml"
-
+  template "#{deploy[:deploy_to]}/shared/secrets.yml" do
+    source "secrets.yml.erb"
     mode 0660
     group deploy[:group]
     if platform?('ubuntu')
@@ -37,11 +37,33 @@ node[:deploy].each do |application, deploy|
       owner 'apache'
     end
 
-    variables { key => deploy.fetch(key), :environment => deploy[:rails_env] }
+    variables(:vars => deploy.fetch(:secrets), :environment => deploy[:rails_env])
 
     only_if do
-      deploy[key].present? && File.directory?("#{deploy[:deploy_to]}/shared/")
+      deploy[:secrets].present? && File.directory?("#{deploy[:deploy_to]}/shared/")
     end
   end
+  #[:secrets,
+  # :s3_credentials,
+  # :insightly,
+  # :xero
+  #].each do |key|
+  #  template "#{deploy[:deploy_to]}/shared/#{key.to_s}.yml" do
+  #    source "#{key.to_s}.yml"
+  #    mode 0660
+  #    group deploy[:group]
+  #    if platform?('ubuntu')
+  #      owner 'www-data'
+  #    elsif platform?('amazon')
+  #      owner 'apache'
+  #    end
+
+  #    variables { vars: deploy.fetch(key), environment: deploy[:rails_env] }
+
+  #    only_if do
+  #      deploy[key].present? && File.directory?("#{deploy[:deploy_to]}/shared/")
+  #    end
+  #  end
+  #end
 
 end

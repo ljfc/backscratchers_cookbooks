@@ -1,5 +1,5 @@
 <% (['development', 'production'] + [@environment]).uniq.flatten.each do |env| %>
 <%= env %>:
-  api_key: <%= @insightly[:api_key] %>
+  api_key: <%= @vars[:api_key] %>
 
 <% end %>
