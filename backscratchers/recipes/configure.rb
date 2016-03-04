@@ -37,10 +37,7 @@ node[:deploy].each do |application, deploy|
       owner 'apache'
     end
 
-    variables {
-      key => deploy.fetch(key),
-      :environment => deploy[:rails_env]
-    }
+    variables { key => deploy.fetch(key), :environment => deploy[:rails_env] }
 
     only_if do
       deploy[key].present? && File.directory?("#{deploy[:deploy_to]}/shared/")
