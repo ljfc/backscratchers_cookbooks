@@ -1,3 +1,5 @@
+include_recipe 'deploy'
+
 # AWS OpsWorks recipe to be excuted when deploying the Backscratchers application.
 #
 # This should be run as an additional recipe on a standard Rails App Server layer.
