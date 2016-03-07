@@ -13,6 +13,12 @@ node[:deploy].each do |application, deploy|
   end
   Chef::Log.info "Deploying Backscratchers application '#{application}'"
 
+  begin
+    Chef::Log.info "Deployment release path is #{release_path}"
+  rescue => e
+    Chef::Log.info "There was an error when trying to print the release path"
+  end
+
   deploy deploy[:deploy_to] do
     before_symlink do
       directory "#{release_path}/tmp" do
