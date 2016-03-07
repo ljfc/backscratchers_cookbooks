@@ -13,9 +13,12 @@ node[:deploy].each do |application, deploy|
   end
   Chef::Log.info "Deploying Backscratchers application '#{application}'"
 
-  before_symlink do
-    directory "#{release_path}/tmp" do
-      mode 0770
+  deploy deploy[:deploy_to] do
+    before_symlink do
+      directory "#{release_path}/tmp" do
+        mode 0770
+      end
     end
   end
+
 end
