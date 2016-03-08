@@ -1,1 +1,1 @@
-name 'backscratchers_cookbook'
+name 'bs'
