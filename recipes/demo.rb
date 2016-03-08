@@ -7,8 +7,9 @@ package node.value_for_platform(
                         '~> 6.0' => %w{mysql-devel postgresql-libs postgresql-devel sqlite-devel}},
 )
 
-# Application resource for Todo_Express.
-application node['todo_rails']['path'] do
+application 'Install a demo app' do
+  path '/srv/demo'
+
   # Clone the source code from GitHub.
   git 'https://github.com/engineyard/todo.git'
   # Install Ruby.
