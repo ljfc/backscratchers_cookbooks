@@ -4,7 +4,7 @@ db = search('aws_opsworks_rds_db_instance').first
 application '/backscratchers' do
 
   ruby do
-    provide :ruby_build
+    provider :ruby_build
     version '2.1.3'
   end
 
