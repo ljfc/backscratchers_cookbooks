@@ -3,7 +3,10 @@ db = search('aws_opsworks_rds_db_instance').first
 
 application '/backscratchers' do
 
-  ruby '2.1.3'
+  ruby do
+    provide :ruby_build
+    version '2.1.3'
+  end
 
   git do
     repository app['app_source']['url']
