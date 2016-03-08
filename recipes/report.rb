@@ -19,7 +19,7 @@ data_bag_indices.each do |index|
       if item.any?
         Chef::Log.info("\t\t\t[")
         item.each do |sub_item|
-          Chef::Log.info("#{sub_item.inspect}")
+          Chef::Log.info("\t\t\t\t#{sub_item.inspect}")
         end
         Chef::Log.info("\t\t\t]")
       else
