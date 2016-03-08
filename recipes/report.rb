@@ -14,17 +14,21 @@ data_bag_indices.each do |index|
   data = search(index.to_s)
   Chef::Log.info("\t#{index}")
   if data.any?
+    Chef::Log.info("\t\t[")
     data.each do |item|
       if item.any?
+        Chef::Log.info("\t\t\t[")
         item.each do |sub_item|
           Chef::Log.info("#{sub_item.inspect}")
         end
+        Chef::Log.info("\t\t\t]")
       else
-        Chef::Log.info("#{item.inspect}")
+        Chef::Log.info("\t\t\t#{item.inspect}")
       end
     end
+    Chef::Log.info("\t\t]")
   else
-    Chef::Log.info("#{data.inspect}")
+    Chef::Log.info("\t\t#{data.inspect}")
   end
 end
 
