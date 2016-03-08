@@ -1,9 +1,0 @@
-<% (['development', 'production'] + [@environment]).uniq.flatten.each do |env| %>
-<%= env %>:
-  api_key: <%= @vars[:api_key] %>
-  consumer_key: <%= @vars[:consumer_key] %>
-  consumer_secret: <%= @vars[:consumer_secret] %>
-  api_endpoint_url: <%= @vars[:api_endpoint_url] %>
-  path_to_private_key: <%= @vars[:path_to_private_key] %>
-
-<% end %>
