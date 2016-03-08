@@ -13,7 +13,19 @@ data_bag_indices = [:aws_opsworks_app,
 data_bag_indices.each do |index|
   data = search(index.to_s)
   Chef::Log.info("\t#{index}")
-  Chef::Log.info("#{data.inspect}")
+  if data.any?
+    data.each do |item|
+      if item.any?
+        item.each do |sub_item|
+          Chef::Log.info("#{sub_item.inspect}")
+        end
+      else
+        Chef::Log.info("#{item.inspect}")
+      end
+    end
+  else
+    Chef::Log.info("#{data.inspect}")
+  end
 end
 
 Chef::Log.info("*** Report complete ***")
