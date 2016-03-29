@@ -7,8 +7,8 @@ include_recipe 'apt::default'
 # https://www.phusionpassenger.com/library/install/nginx/install/oss/trusty/
 Chef::Log.info("Passenger setup")
 # Install dependencies.
-package 'apt-transport-https'
-package 'ca-certificates'
+#package 'apt-transport-https'
+#package 'ca-certificates'
 # Add the Passenger APT repository.
 apt_repository 'passenger' do
   uri 'https://oss-binaries.phusionpassenger.com/apt/passenger'
@@ -18,12 +18,10 @@ apt_repository 'passenger' do
   keyserver 'keyserver.ubuntu.com'
   key '561F9B9CAC40B2F7'
 end
-# Install Passenger itself, plus nginx extras.
-package 'nginx-extras'
 package 'passenger'
 
 Chef::Log.info("NGINX setup")
-package 'nginx'
+package 'nginx-extras' # The -extras version includes a bunch of extra modules, and is the version Passenger recommend.
 service 'nginx' do
   action [:enable, :start]
 end
