@@ -7,20 +7,19 @@ Chef::Log.info("The Backscratchers deploy recipe called")
 app = search('aws_opsworks_app', 'shortname:backscratchers').first
 db = search('aws_opsworks_rds_db_instance').first
 
-ruby_runtime 'backscratchers' do
-  Chef::Log.info("Ruby setup for Backscratchers deploy")
-  provider :ruby_build
-  version '2.1.3'
-end
+#ruby_runtime 'backscratchers' do
+#  Chef::Log.info("Ruby setup for Backscratchers deploy")
+#  provider :ruby_build
+#  version '2.1.3'
+#end
 
 application '/srv/backscratchers' do
   Chef::Log.info("Deploying The Backscratchers")
 
-  #ruby do
-  #  #provider :ruby_build
-  #  provider :system
-  #  version '2.1.3'
-  #end
+  ruby do
+    provider :ruby_build
+    version '2.1.3'
+  end
 
   Chef::Log.info("Installing with git from #{app['app_source']['url']}")
   git do
