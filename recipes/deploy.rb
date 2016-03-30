@@ -2,33 +2,44 @@ Chef::Log.info("The Backscratchers deploy recipe called")
 
 # Deploy the site.
 #
-# The recommended approach is to use deploy_revision, as it is idempotent if the same version of the code is deployed multiple times.
+# We are using the Poise Application family of cookbooks: https://github.com/poise/application
 #
-deploy_revision 'backscratchers' do 
+app = search('aws_opsworks_app', 'shortname:backscratchers').first
+db = search('aws_opsworks_rds_db_instance').first
 
-  repository 'https://github.com/ljfc/backscratchers'
-  revision 'checking'
+application '/srv/backscratchers' do
+  Chef::Log.info("Deploying The Backscratchers")
 
-  environment 'RAILS_ENV' => 'pre_staging'
-
-  migrate false # TODO @leo Figure out when this ought to be true. Could it cause an issue if run on multiple servers simultaneously? In which case maybe it should be managed separately from deployment.
-  # migration_command # TODO @leo What should this be? Is the default okay for Rails?
-  
-  before_migrate do # TODO @leo Figure out if database.yml needs creating here, and then what else needs creating.
-    Chef::Log.info("Running before_migrate callback")
+  ruby do
+    provider :ruby_build
+    version '2.1.3'
   end
 
-  rollback_on_error true # TODO @leo Test that this works.
+  Chef::Log.info("Installing with git from #{app['app_source']['url']}")
+  git do
+    repository app['app_source']['url']
+    deploy_key app['app_source']['ssh_key']
+  end
 
-  #symlink_before_migrate 'config/database.yml' => 'config/database.yml' # Additional files to symlink before running migrations.
-  #purge_before_symlink # Directories to purge. Default is the same as create_dirs... below.
-  #create_dirs_before_symlink # Directories to create before running symlink. Default tmp/ public/ config/
-  #symlinks # Additional files to symlink before restarting following deployment. Default system => public/system, pids => tmp/pids, log => log
+  Chef::Log.info("Bundling gems")
+  bundle_install do
+    deployment true
+    without %w{development test}
+  end
 
-  user 'ubuntu'
-  group 'www-data' # So that web-related users can access the application. TODO @leo Is this best practice? Should the web application user have access to all the site files?
+  Chef::Log.info("Deploying rails app...")
+  rails do
+    Chef::Log.info("\t...using database #{db['db_instance_identifier']} at #{db['address']}")
+    database do
+      adapter 'mysql2'
+      host db['address']
+      username db['db_user']
+      password db['db_password']
+      database db['db_instance_identifier']
+    end
+  end
 
-  notifies :restart, 'service[nginx]', :delayed
+  #notifies :restart, 'service[nginx]', :delayed
 end
 
 # Restart (or start) NGINX.
