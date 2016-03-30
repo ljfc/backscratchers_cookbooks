@@ -7,3 +7,4 @@ version '0.0.0'
 
 depends 'apt', '~> 3.0.0'
 depends 'application', '~> 5.1.0'
+depends 'poise-ruby-build', '~> 1.0.1'
