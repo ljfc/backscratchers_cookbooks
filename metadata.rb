@@ -6,3 +6,4 @@ long_description 'Manages infrastructure for The Backscratchers website on Amazo
 version '0.0.0'
 
 depends 'apt', '~> 3.0.0'
+depends 'application', '~> 5.1.0'
