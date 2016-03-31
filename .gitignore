@@ -18,3 +18,6 @@ bin/*
 
 .kitchen/
 .kitchen.local.yml
+
+# Directory used in custom deployment approach
+/packages

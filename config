@@ -1,0 +1,2 @@
+[alias]
+  chef = "!rm -f packages/* && berks package packages/$(git symbolic-ref --short HEAD).tar.gz && aws s3 cp packages/* s3://backscratchers.operations/cookbooks/"
