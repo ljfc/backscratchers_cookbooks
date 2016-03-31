@@ -15,6 +15,8 @@ db = search('aws_opsworks_rds_db_instance').first
 
 application '/srv/backscratchers' do
   Chef::Log.info("Deploying The Backscratchers")
+  owner 'ubuntu'
+  group 'www-data'
 
   ruby do
     provider :ruby_build
@@ -25,6 +27,7 @@ application '/srv/backscratchers' do
   git do
     repository app['app_source']['url']
     deploy_key app['app_source']['ssh_key']
+    revision app['app_source']['revision']
   end
 
   Chef::Log.info("Bundling gems")
@@ -46,6 +49,10 @@ application '/srv/backscratchers' do
   end
 
   #notifies :restart, 'service[nginx]', :delayed
+end
+
+file '/srv/backscratchers/.ruby-version' do # Override .ruby-version so it’s got the name poise-ruby-build assigns.
+  content 'backscratchers'
 end
 
 # Restart (or start) NGINX.
