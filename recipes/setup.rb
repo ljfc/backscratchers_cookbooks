@@ -26,3 +26,5 @@ service 'nginx' do
   action [:enable, :start]
 end
 
+Chef::Log.info("MySQL setup")
+package 'libmysqlclient-dev'
