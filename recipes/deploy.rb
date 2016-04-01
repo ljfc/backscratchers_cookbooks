@@ -1,9 +1,11 @@
-Chef::Log.info("The Backscratchers deploy recipe called")
-
 # Deploy the site.
 #
 # We are using the Poise Application family of cookbooks: https://github.com/poise/application
 #
+
+Chef::Log.info("The Backscratchers deploy recipe called")
+include_recipe 'bs::report'
+
 app = search('aws_opsworks_app', 'shortname:backscratchers').first
 db = search('aws_opsworks_rds_db_instance').first
 
@@ -39,6 +41,7 @@ application '/srv/backscratchers' do
   Chef::Log.info("Deploying rails app...")
   rails do
     Chef::Log.info("\t...using database #{db['db_instance_identifier']} at #{db['address']}")
+    # TODO @leo Use the appropriate environment (it defaults to production).
     database do
       adapter 'mysql2'
       host db['address']
@@ -47,6 +50,8 @@ application '/srv/backscratchers' do
       database db['db_instance_identifier']
     end
   end
+
+  # TODO @leo Generate secrets.yml from the provided data (refactoring all the other crap into it?)
 
   #notifies :restart, 'service[nginx]', :delayed
 end

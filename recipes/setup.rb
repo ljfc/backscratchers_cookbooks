@@ -1,4 +1,8 @@
+# Set up a server.
+#
+
 Chef::Log.info("The Backscratchers setup recipe called")
+include_recipe 'bs::report'
 
 Chef::Log.info("Updating APT")
 include_recipe 'apt::default'
