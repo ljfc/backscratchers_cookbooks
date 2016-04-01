@@ -8,12 +8,7 @@ include_recipe 'bs::report'
 
 app = search('aws_opsworks_app', 'shortname:backscratchers').first
 db = search('aws_opsworks_rds_db_instance').first
-
-#ruby_runtime 'backscratchers' do
-#  Chef::Log.info("Ruby setup for Backscratchers deploy")
-#  provider :ruby_build
-#  version '2.1.3'
-#end
+secrets = node['secrets']
 
 application '/srv/backscratchers' do
   Chef::Log.info("Deploying The Backscratchers")
@@ -41,7 +36,7 @@ application '/srv/backscratchers' do
   Chef::Log.info("Deploying rails app...")
   rails do
     Chef::Log.info("\t...using database #{db['db_instance_identifier']} at #{db['address']}")
-    # TODO @leo Use the appropriate environment (it defaults to production).
+    rails_env app['environment']['RAILS_ENV']
     database do
       adapter 'mysql2'
       host db['address']
@@ -58,6 +53,35 @@ end
 
 file '/srv/backscratchers/.ruby-version' do # Override .ruby-version so it’s got the name poise-ruby-build assigns.
   content 'backscratchers'
+end
+
+template '/srv/backscratchers/config/secrets.yml' do
+  Chef::Log.info 'Processing template secrets.yml'
+  source 'secrets.yml.erb'
+  mode 0640
+  user 'ubuntu'
+  group 'www-data'
+  variables(vars: secrets, environment: app['environment']['RAILS_ENV'])
+end
+
+if secrets['xero'].has_key?('live_privatekey')
+  file '/srv/backscratchers/config/xero_live_privatekey.pem' do
+    Chef::Log.info 'Creating xero_live_privatekey.pem'
+    content secrets['xero']['live_privatekey']
+    mode 0640
+    user 'ubuntu'
+    group 'www-data'
+  end
+end
+
+if secrets['xero'].has_key?('test_privatekey')
+  file '/srv/backscratchers/config/xero_test_privatekey.pem' do
+    Chef::Log.info 'Creating xero_test_privatekey.pem'
+    content secrets['xero']['test_privatekey']
+    mode 0640
+    user 'ubuntu'
+    group 'www-data'
+  end
 end
 
 # Restart (or start) NGINX.
