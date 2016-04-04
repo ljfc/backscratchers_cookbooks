@@ -37,18 +37,15 @@ application '/srv/backscratchers' do
   rails do
     Chef::Log.info("\t...using database #{db['db_instance_identifier']} at #{db['address']}")
     rails_env app['environment']['RAILS_ENV']
-    database do
-      adapter 'mysql2'
-      host db['address']
-      username db['db_user']
-      password db['db_password']
-      database db['db_instance_identifier']
-    end
+    Chef::Log.info "Setting database name to #{db['db_instance_identifier']}"
+    database({
+      adapter: 'mysql2',
+      host: db['address'],
+      username: db['db_user'],
+      password: db['db_password'],
+      database: db['db_instance_identifier']
+    })
   end
-
-  # TODO @leo Generate secrets.yml from the provided data (refactoring all the other crap into it?)
-
-  #notifies :restart, 'service[nginx]', :delayed
 end
 
 file '/srv/backscratchers/.ruby-version' do # Override .ruby-version so it’s got the name poise-ruby-build assigns.
@@ -84,8 +81,7 @@ if secrets['xero'].has_key?('test_privatekey')
   end
 end
 
-# Restart (or start) NGINX.
-#Chef::Log.info("NGINX deployment")
-#service 'nginx' do
-#  action :restart
-#end
+service 'nginx' do
+  Chef::Log.info("NGINX deployment")
+  action :restart
+end
