@@ -43,7 +43,7 @@ application '/srv/backscratchers' do
       host: db['address'],
       username: db['db_user'],
       password: db['db_password'],
-      database: db['db_instance_identifier']
+      database: app['data_sources'].first['database_name']
     })
   end
 end
