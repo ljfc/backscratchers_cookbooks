@@ -8,6 +8,9 @@ include_recipe 'bs::report'
 
 app = search('aws_opsworks_app', 'shortname:backscratchers').first
 db = search('aws_opsworks_rds_db_instance').first
+if node.has_key? 'rds' # Override the OpsWorks RDS info.
+  db = node['rds']
+end
 secrets = node['secrets']
 
 application '/srv/backscratchers' do
@@ -34,16 +37,18 @@ application '/srv/backscratchers' do
   end
 
   Chef::Log.info("Deploying rails app...")
+  database_name = app['data_sources'].first['database_name']
+  database_name ||= db.fetch('database_name')
+  Chef::Log.info "...setting database name to #{database_name}..."
   rails do
     Chef::Log.info("\t...using database #{db['db_instance_identifier']} at #{db['address']}")
     rails_env app['environment']['RAILS_ENV']
-    Chef::Log.info "Setting database name to #{db['db_instance_identifier']}"
     database({
       adapter: 'mysql2',
       host: db['address'],
       username: db['db_user'],
       password: db['db_password'],
-      database: app['data_sources'].first['database_name']
+      database: database_name
     })
   end
 end
