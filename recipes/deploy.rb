@@ -51,7 +51,6 @@ application '/srv/backscratchers' do
     ruby '/opt/ruby_build/builds/backscratchers/bin/ruby'
     user 'root'
     environment({ 'PATH' => '/opt/ruby_build/builds/backscratchers/lib/ruby/gems/2.1.0/bin:/opt/ruby_build/builds/backscratchers/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games' }) # We have to set the path correctly, otherwise it will not be passed in to the whenever gem, and therefore not passed in to cron.
-    Chef::Log.info("Running whenever gem for role list: #{instance['role'].join(',')} with environment #{app['environment']['RAILS_ENV']}")
     command %Q{bin/whenever --update-crontab --roles #{instance['role'].join(',')} --set 'environment=#{app['environment']['RAILS_ENV']}' --user www-data}
   end
 end
@@ -61,7 +60,6 @@ file '/srv/backscratchers/.ruby-version' do # Override .ruby-version so it’s g
 end
 
 template '/srv/backscratchers/config/secrets.yml' do # Access to third-party APIs will need the appropriate secret keys.
-  Chef::Log.info 'Processing template secrets.yml'
   source 'secrets.yml.erb'
   mode 0640
   user 'ubuntu'
