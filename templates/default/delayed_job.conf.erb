@@ -8,7 +8,7 @@ setuid www-data
 chdir /srv/backscratchers
 
 respawn
-respawn limit 1 60
+respawn limit 2 60
 
 env RAILS_ENV=<%= @environment %>
 env PATH=/home/ubuntu/.gem/ruby/2.1.3/bin:/opt/ruby_build/builds/backscratchers/lib/ruby/gems/2.1.0/bin:/opt/ruby_build/builds/backscratchers/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games

@@ -47,13 +47,13 @@ application '/srv/backscratchers' do
     })
   end
 
-  #Chef::Log.info("Start cron tasks")
-  #ruby_execute 'whenever' do
-  #  ruby '/opt/ruby_build/builds/srv/backscratchers/bin/ruby'
-  #  user 'root'
-  #  Chef::Log.info("Running whenever gem for role list: #{instance['role'].join(',')} with environment #{app['environment']['RAILS_ENV']}")
-  #  command %Q{bin/whenever --update-crontab --roles #{instance['role'].join(',')} --set 'environment=#{app['environment']['RAILS_ENV']}' --user www-data}
-  #end
+  ruby_execute 'whenever' do
+    ruby '/opt/ruby_build/builds/backscratchers/bin/ruby'
+    user 'root'
+    environment({ 'PATH' => '/opt/ruby_build/builds/backscratchers/lib/ruby/gems/2.1.0/bin:/opt/ruby_build/builds/backscratchers/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games' }) # We have to set the path correctly, otherwise it will not be passed in to the whenever gem, and therefore not passed in to cron.
+    Chef::Log.info("Running whenever gem for role list: #{instance['role'].join(',')} with environment #{app['environment']['RAILS_ENV']}")
+    command %Q{bin/whenever --update-crontab --roles #{instance['role'].join(',')} --set 'environment=#{app['environment']['RAILS_ENV']}' --user www-data}
+  end
 end
 
 file '/srv/backscratchers/.ruby-version' do # Override .ruby-version so it’s got the name poise-ruby-build assigns.
@@ -86,6 +86,9 @@ elsif secrets['xero'].has_key?('test_privatekey')
     group 'www-data'
   end
 end
+
+execute 'chown ubuntu:www-data /srv/backscratchers/log/*.log' # Log files have to be owned by the web user.
+execute 'chmod ug+w /srv/backscratchers/log/*.log' # Log files must be writeable.
 
 service 'nginx' do # The site has changed, so NGINX needs to be restarted to pick this up.
   action :restart
