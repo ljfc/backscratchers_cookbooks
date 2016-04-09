@@ -1,0 +1,16 @@
+server {
+  listen 80;
+  listen [::]:80;
+
+  root /srv/backscratchers/public;
+  passenger_enabled on;
+  passenger_ruby /opt/ruby_build/builds/backscratchers/bin/ruby;
+  rails_env <%= @environment %>;
+
+  client_max_body_size 30M;
+
+  error_page 500 502 503 504 /50x.html;
+  location = /50x.html {
+    root html;
+  }
+}

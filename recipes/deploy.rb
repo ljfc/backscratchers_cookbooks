@@ -1,4 +1,4 @@
-# Deploy the site.
+# Deploy the application.
 #
 # We are using the Poise Application family of cookbooks: https://github.com/poise/application
 #
@@ -6,42 +6,37 @@
 Chef::Log.info("The Backscratchers deploy recipe called")
 include_recipe 'bs::report'
 
+instance = search('aws_opsworks_instance', 'self:true').first
 app = search('aws_opsworks_app', 'shortname:backscratchers').first
 db = search('aws_opsworks_rds_db_instance').first
-if node.has_key? 'rds' # Override the OpsWorks RDS info.
+secrets = node['secrets']
+if node.has_key? 'rds' # Override the OpsWorks RDS info, so we are not always stuck with the AWS RDS info provided by default.
   db = node['rds']
 end
-secrets = node['secrets']
 
 application '/srv/backscratchers' do
-  Chef::Log.info("Deploying The Backscratchers")
   owner 'ubuntu'
   group 'www-data'
 
-  ruby do
+  ruby 'backscratchers' do
     provider :ruby_build
     version '2.1.3'
   end
 
-  Chef::Log.info("Installing with git from #{app['app_source']['url']}")
   git do
     repository app['app_source']['url']
     deploy_key app['app_source']['ssh_key']
     revision app['app_source']['revision']
   end
 
-  Chef::Log.info("Bundling gems")
   bundle_install do
     deployment true
     without %w{development test}
   end
 
-  Chef::Log.info("Deploying rails app...")
   database_name = app['data_sources'].first['database_name']
   database_name ||= db.fetch('database_name')
-  Chef::Log.info "...setting database name to #{database_name}..."
   rails do
-    Chef::Log.info("\t...using database #{db['db_instance_identifier']} at #{db['address']}")
     rails_env app['environment']['RAILS_ENV']
     database({
       adapter: 'mysql2',
@@ -51,13 +46,21 @@ application '/srv/backscratchers' do
       database: database_name
     })
   end
+
+  #Chef::Log.info("Start cron tasks")
+  #ruby_execute 'whenever' do
+  #  ruby '/opt/ruby_build/builds/srv/backscratchers/bin/ruby'
+  #  user 'root'
+  #  Chef::Log.info("Running whenever gem for role list: #{instance['role'].join(',')} with environment #{app['environment']['RAILS_ENV']}")
+  #  command %Q{bin/whenever --update-crontab --roles #{instance['role'].join(',')} --set 'environment=#{app['environment']['RAILS_ENV']}' --user www-data}
+  #end
 end
 
 file '/srv/backscratchers/.ruby-version' do # Override .ruby-version so it’s got the name poise-ruby-build assigns.
   content 'backscratchers'
 end
 
-template '/srv/backscratchers/config/secrets.yml' do
+template '/srv/backscratchers/config/secrets.yml' do # Access to third-party APIs will need the appropriate secret keys.
   Chef::Log.info 'Processing template secrets.yml'
   source 'secrets.yml.erb'
   mode 0640
@@ -66,7 +69,7 @@ template '/srv/backscratchers/config/secrets.yml' do
   variables(vars: secrets, environment: app['environment']['RAILS_ENV'])
 end
 
-if secrets['xero'].has_key?('live_privatekey')
+if secrets['xero'].has_key?('live_privatekey') # Access to the Xero API will need the appropriate key file.
   file '/srv/backscratchers/config/xero_live_privatekey.pem' do
     Chef::Log.info 'Creating xero_live_privatekey.pem'
     content secrets['xero']['live_privatekey']
@@ -74,9 +77,7 @@ if secrets['xero'].has_key?('live_privatekey')
     user 'ubuntu'
     group 'www-data'
   end
-end
-
-if secrets['xero'].has_key?('test_privatekey')
+elsif secrets['xero'].has_key?('test_privatekey')
   file '/srv/backscratchers/config/xero_test_privatekey.pem' do
     Chef::Log.info 'Creating xero_test_privatekey.pem'
     content secrets['xero']['test_privatekey']
@@ -86,7 +87,9 @@ if secrets['xero'].has_key?('test_privatekey')
   end
 end
 
-service 'nginx' do
-  Chef::Log.info("NGINX deployment")
+service 'nginx' do # The site has changed, so NGINX needs to be restarted to pick this up.
   action :restart
+end
+service 'delayed_job' do # Restart delayed_job to pick up any changes.
+  action [:enable, :restart]
 end
