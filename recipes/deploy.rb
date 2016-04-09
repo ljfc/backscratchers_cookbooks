@@ -87,12 +87,13 @@ elsif secrets['xero'].has_key?('test_privatekey')
   end
 end
 
-execute 'chown ubuntu:www-data /srv/backscratchers/log/*.log' # Log files have to be owned by the web user.
-execute 'chmod ug+w /srv/backscratchers/log/*.log' # Log files must be writeable.
-
 service 'nginx' do # The site has changed, so NGINX needs to be restarted to pick this up.
   action :restart
 end
+execute 'curl 0.0.0.0/healthcheck' # Make sure Passenger has actually started and is serving things.
+execute 'chown -R ubuntu:www-data /srv/backscratchers/log' # Log files have to be owned by the web user.
+execute 'chmod -R ug+w /srv/backscratchers/log' # Log files must be writeable.
+
 service 'delayed_job' do # Restart delayed_job to pick up any changes.
   action [:enable, :restart]
 end

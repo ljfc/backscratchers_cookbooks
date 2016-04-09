@@ -12,7 +12,6 @@ if node.has_key? 'rds' # Override the OpsWorks RDS info, so we are not always st
   db = node['rds']
 end
 
-Chef::Log.info("Updating APT")
 include_recipe 'apt::default'
 
 # Install Passenger, see
@@ -45,7 +44,7 @@ link '/etc/nginx/sites-enabled/backscratchers' do # Tell NGINX to actually serve
   to '/etc/nginx/sites-available/backscratchers'
 end
 service 'nginx' do
-  action [:enable, :start]
+  action [:enable, :restart]
 end
 
 package 'libmysqlclient-dev' # Required for MySQL database access.
