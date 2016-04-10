@@ -1,0 +1,22 @@
+[Main]
+user-key = #{secrets['logentries']['user_key']}
+user-key = <%= @logentries['user_key'] %>
+pull-server-side-config=False
+
+metrics-interval = 5s
+metrics-token = <%= @logentries['metrics'] %>
+metrics-cpu = system
+metrics-vcpu = core
+metrics-mem = system
+
+[rails]
+path = /srv/backscratchers/log/<%= @environment %>.log
+destination = backscratchers_<%= @environment %>/rails
+
+[cron]
+path = /srv/backscratchers/log/cron.log
+destination = backscratchers_<%= @environment %>/rails
+
+[xero]
+path = /srv/backscratchers/log/xero.log
+destination = backscratchers_<%= @environment %>/rails
