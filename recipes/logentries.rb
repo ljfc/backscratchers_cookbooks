@@ -22,27 +22,10 @@ package 'logentries-daemon'
 directory '/etc/le' do
   mode 0750
 end
-file '/etc/le/config' do
-  content %Q{[Main]
-user-key = #{secrets['logentries']['user_key']}
-pull-server-side-config=False
-
-metrics-interval = 5s
-metrics-token = 080e2db3-8f58-4314-84c8-b1087db8ebf1
-metrics-cpu = system
-metrics-vcpu = core
-metrics-mem = system
-
-[BackscratchersRailsLog]
-path = /srv/backscratchers/log/#{app['environment']['RAILS_ENV']}.log
-destination = BackscratchersStaging/Rails
-token = #{secrets['logentries']['rails']}
-
-[BackscratchersCronLog]
-path = /srv/backscratchers/log/cron.log
-destination = BackscratchersStaging/RailsCron
-}
+template '/etc/le/config' do
+  source 'logentries.erb'
   mode 0640
+  variables(environment: app['environment']['RAILS_ENV'], logentries: secrets['logentries'])
 end
 
 service 'logentries' do
