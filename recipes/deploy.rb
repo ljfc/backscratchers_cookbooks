@@ -95,3 +95,10 @@ execute 'chmod -R ug+w /srv/backscratchers/log' # Log files must be writeable.
 service 'delayed_job' do # Restart delayed_job to pick up any changes.
   action [:enable, :restart]
 end
+
+ruby_execute 'heartbeat' do # Say hello.
+  ruby '/opt/ruby_build/builds/backscratchers/bin/ruby'
+  cwd '/srv/backscratchers'
+  environment({ 'RAILS_ENV' => app['environment']['RAILS_ENV'] }) 
+  command %Q{bin/rake admin:heartbeat}
+end
