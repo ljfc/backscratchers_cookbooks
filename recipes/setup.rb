@@ -91,3 +91,17 @@ end
 
 package 'ghostscript' # Dragonfly gem uses this to make thumbnails from PDFs.
 package 'imagemagick' # Dragonfly gem uses this to make thumbnails. Install it after the above so it includes Ghostscript (this may not in fact be necessary, but hey-ho).
+
+package 'awscli' # We need to interact with AWS for things like sharing letsencrypt credentials.
+directory '/root/.aws' do
+  mode 0700
+end
+file '/root/.aws/config' do
+  content %Q{[default]
+aws_access_key_id = #{secrets['s3_credentials']['access_key_id']}
+output = json
+region = #{secrets['s3_credentials']['region']}
+aws_secret_access_key = #{secrets['s3_credentials']['secret_access_key']}
+}
+  mode 0600
+end

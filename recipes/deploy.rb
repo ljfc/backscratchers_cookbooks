@@ -53,6 +53,17 @@ application '/srv/backscratchers' do
     environment({ 'PATH' => '/opt/ruby_build/builds/backscratchers/lib/ruby/gems/2.1.0/bin:/opt/ruby_build/builds/backscratchers/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games' }) # We have to set the path correctly, otherwise it will not be passed in to the whenever gem, and therefore not passed in to cron.
     command %Q{bin/whenever --update-crontab --roles #{instance['role'].join(',')} --set 'environment=#{app['environment']['RAILS_ENV']}' --user www-data}
   end
+
+  directory '/srv/backscratchers/public/.well-known' do # Create directories for letsencrypt ACME challenge responses...
+    mode 0755
+    user 'ubuntu'
+    group 'www-data'
+  end
+  directory '/srv/backscratchers/public/.well-known/acme-challenge' do # ... .
+    mode 0755
+    user 'ubuntu'
+    group 'www-data'
+  end
 end
 
 file '/srv/backscratchers/.ruby-version' do # Override .ruby-version so it’s got the name poise-ruby-build assigns.

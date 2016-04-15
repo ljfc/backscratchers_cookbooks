@@ -1,4 +1,9 @@
-# Stuff to go in other recipes soon...
+# Set up logging to the Logentries service.
+#
+# The system will work just fine without this, so if you want it you have to call it explicitly.
+#
+
+Chef::Log.info("The Backscratchers logentries recipe called")
 
 instance = search('aws_opsworks_instance', 'self:true').first
 app = search('aws_opsworks_app', 'shortname:backscratchers').first
