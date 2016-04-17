@@ -10,6 +10,7 @@ app = search('aws_opsworks_app', 'shortname:backscratchers').first
 options = node['maintenance'] || {}
 enable = options.has_key?('enable') ? options['enable'] : true
 message = options.has_key?('message') ? options['message'] : "The Backscratchers is down for planned maintenance. Back soon!"
+enable = false if enable == 'false'
 
 Chef::Log.info("The Backscratchers going #{enable ? 'into' : 'out of'} maintenance mode")
 Chef::Log.info("options hash is #{options.inspect}")
