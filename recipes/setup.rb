@@ -88,3 +88,10 @@ template '/etc/init/delayed_job.conf' do
   mode 0400
   variables(environment: app['environment']['RAILS_ENV'])
 end
+
+package 'ghostscript' # Dragonfly gem uses this to make thumbnails from PDFs.
+package 'libgs-dev' # Contains required headers for Imagemagick to work with Ghostscript.
+#package 'libmagickcore-dev' # Contains required headers for Imagemagick to work with Ghostscript.
+#package 'libmagickwand-dev' # Contains required headers for Imagemagick to work with Ghostscript.
+#package 'graphicsmagick-libmagick-dev-compat' # Contains required headers for Imagemagick to work with Ghostscript.
+package 'imagemagick' # Dragonfly gem uses this to make thumbnails. Install it after the above so it includes Ghostscript.
