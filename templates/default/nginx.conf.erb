@@ -25,9 +25,7 @@ http {
 
   passenger_root /usr/lib/ruby/vendor_ruby/phusion_passenger/locations.ini;
   passenger_ruby /usr/bin/passenger_free_ruby;
-  passenger_min_instances 4;
-  passenger_max_instances 4;
-  passenger_pre_start http://0.0.0.0/;
+  passenger_pre_start http://0.0.0.0/healthcheck;
 
   include /etc/nginx/conf.d/*.conf;
   include /etc/nginx/sites-enabled/*;
