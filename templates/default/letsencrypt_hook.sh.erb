@@ -93,9 +93,9 @@ function deploy_cert {
 function unchanged_cert {
     local DOMAIN="${1}" KEYFILE="${2}" CERTFILE="${3}" FULLCHAINFILE="${4}" CHAINFILE="${5}"
 
-    echo " +++ undhancged_cert hook +++"
+    echo " +++ unchanged_cert hook +++"
     date
-    echo " +++ undhancged_cert hook done +++"
+    echo " +++ unchanged_cert hook done +++"
 
     # This hook is called once for each certificate that is still
     # valid and therefore wasn't reissued.

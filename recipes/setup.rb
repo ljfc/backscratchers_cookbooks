@@ -14,6 +14,12 @@ end
 
 include_recipe 'apt::default'
 
+template '/etc/logrotate.d/backscratchers' do # Rotate our custom logs.
+  source 'logrotate.erb'
+  variables(environment: app['environment']['RAILS_ENV'])
+  mode 0644
+end
+
 # Install Passenger, see
 # https://www.phusionpassenger.com/library/install/nginx/install/oss/trusty/
 apt_repository 'passenger' do # Add the Passenger APT repository.

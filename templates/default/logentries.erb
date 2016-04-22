@@ -8,6 +8,10 @@ metrics-cpu = system
 metrics-vcpu = core
 metrics-mem = system
 
+[syslog]
+path = /var/log/syslog.log
+destination = backscratchers_<%= @environment %>/syslog
+
 [rails]
 path = /srv/backscratchers/log/<%= @environment %>.log
 destination = backscratchers_<%= @environment %>/rails
@@ -19,3 +23,7 @@ destination = backscratchers_<%= @environment %>/rails_cron
 [xero]
 path = /srv/backscratchers/log/xero.log
 destination = backscratchers_<%= @environment %>/rails_xero
+
+[letsencrypt]
+path = /var/log/letsencrypt.log
+destination = backscratchers_<%= @environment %>/letsencrypt

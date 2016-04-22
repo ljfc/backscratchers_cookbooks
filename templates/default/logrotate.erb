@@ -1,0 +1,46 @@
+/srv/backscratchers/log/<%= @environment %>.log {
+  weekly
+  missingok
+  rotate 5
+  compress
+  delaycompress
+  notifempty
+  copytruncate
+}
+
+/srv/backscratchers/log/cron.log {
+  create 0664 ubuntu www-data
+  su ubuntu www-data
+  weekly
+  missingok
+  rotate 5
+  compress
+  delaycompress
+  notifempty
+  copytruncate
+}
+
+/srv/backscratchers/log/xero.log {
+  create 0664 ubuntu www-data
+  su ubuntu www-data
+  weekly
+  missingok
+  rotate 5
+  compress
+  delaycompress
+  notifempty
+  copytruncate
+}
+
+/var/log/letsencrypt {
+  create 0664 ubuntu www-data
+  su ubuntu www-data
+  weekly
+  missingok
+  rotate 5
+  compress
+  delaycompress
+  notifempty
+  copytruncate
+}
+
