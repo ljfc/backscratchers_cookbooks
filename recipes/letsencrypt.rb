@@ -40,21 +40,20 @@ if node.has_key?('letsencrypt') && instance['role'].include?('lead_server') # On
     variables({ domains: (app['domains'] - ['backscratchers']) }) # Subtract the app shortname that AWS adds (annoyingly).
     mode 0600
   end
-  # TODO @leo Make this conditionally push to AWS or not depending on whether there is an ELB.
   template  '/usr/local/etc/letsencrypt_hook.sh' do # Hook for deploying keys to ELB (or whatever)
     source 'letsencrypt_hook.sh.erb'
     variables({ letsencrypt: letsencrypt, elb: elb })
     mode 0700
   end
 
-  letsencrypt_command = "letsencrypt.sh -c"
+  letsencrypt_command = "/usr/local/bin/letsencrypt.sh -c >> /var/log/letsencrypt.log 2>&1"
 
   execute letsencrypt_command # Run the command immediately to update if needed.
   cron 'run letsencrypt regularly' do
     command letsencrypt_command
-    #weekday '4' # Thursday...
-    #hour '11' # ...at 11am.
-    #minute '0'
+    weekday '4' # Thursday...
+    hour '11' # ...at eleven...
+    minute '30' # ...thirty.
   end
 
   execute 'sync letsencrypt from s3' do # Push back up any changes to the config to S3.

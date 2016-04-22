@@ -35,6 +35,7 @@ function deploy_cert {
     local DOMAIN="${1}" KEYFILE="${2}" CERTFILE="${3}" FULLCHAINFILE="${4}" CHAINFILE="${5}" TIMESTAMP="${6}"
 
     echo " +++ deploy_cert hook +++"
+    date
 
     echo "About to push up cert for $DOMAIN"
     echo "Cert will be called $DOMAIN-$TIMESTAMP"
@@ -54,13 +55,13 @@ function deploy_cert {
     # Use the new certificate ARN to tell the Elastic Load Balancer to update.
     if [[ $SERVER_CERTIFICATE =~ (arn:aws:iam::[0-9]*:server-certificate/$DOMAIN-[0-9]*) ]]; then
       echo "Replacing cert on ELB with ${BASH_REMATCH[1]}"
-      sleep 7 # Wait for the new cert to become available.
+      sleep 30 # Wait for the new cert to become available.
       aws elb set-load-balancer-listener-ssl-certificate --load-balancer-name <%= @elb['elastic_load_balancer_name'] %> --load-balancer-port 443 --ssl-certificate-id ${BASH_REMATCH[1]}
     fi
 
     # Delete the old certificate now it is not being used.
     echo "Deleting $OLD_SERVER_CERTIFICATE"
-    sleep 3 # Wait for the new cert to take over.
+    sleep 30 # Wait for the new cert to take over.
     aws iam delete-server-certificate --server-certificate-name $OLD_SERVER_CERTIFICATE
 
     <% else %>
@@ -91,6 +92,10 @@ function deploy_cert {
 
 function unchanged_cert {
     local DOMAIN="${1}" KEYFILE="${2}" CERTFILE="${3}" FULLCHAINFILE="${4}" CHAINFILE="${5}"
+
+    echo " +++ undhancged_cert hook +++"
+    date
+    echo " +++ undhancged_cert hook done +++"
 
     # This hook is called once for each certificate that is still
     # valid and therefore wasn't reissued.
