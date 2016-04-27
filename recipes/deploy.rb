@@ -8,6 +8,7 @@ include_recipe 'bs::report'
 
 instance = search('aws_opsworks_instance', 'self:true').first
 app = search('aws_opsworks_app', 'shortname:backscratchers').first
+elb = search('aws_opsworks_elastic_load_balancer').first
 db = search('aws_opsworks_rds_db_instance').first
 secrets = node['secrets']
 if node.has_key? 'rds' # Override the OpsWorks RDS info, so we are not always stuck with the AWS RDS info provided by default.
@@ -75,7 +76,7 @@ template '/srv/backscratchers/config/secrets.yml' do # Access to third-party API
   mode 0640
   user 'ubuntu'
   group 'www-data'
-  variables(vars: secrets, environment: app['environment']['RAILS_ENV'])
+  variables(vars: secrets, elb: elb, environment: app['environment']['RAILS_ENV'])
 end
 
 if secrets['xero'].has_key?('live_privatekey') # Access to the Xero API will need the appropriate key file.

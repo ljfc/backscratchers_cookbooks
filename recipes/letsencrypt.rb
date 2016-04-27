@@ -59,4 +59,21 @@ if node.has_key?('letsencrypt') && instance['role'].include?('lead_server') # On
   execute 'sync letsencrypt from s3' do # Push back up any changes to the config to S3.
     command "aws s3 sync /etc/letsencrypt.sh #{s3_uri}"
   end
+
+  # Reconfigure the app by updating secrets.yml and restart. 
+  template '/srv/backscratchers/config/secrets.yml' do # TODO @leo This really ought to be a callback or something. Shared code with bs::deploy somehow.
+    source 'secrets.yml.erb'
+    mode 0640
+    user 'ubuntu'
+    group 'www-data'
+    variables(vars: secrets, elb: elb, environment: app['environment']['RAILS_ENV'])
+  end
+  service 'nginx' do # The site has changed, so NGINX needs to be restarted to pick this up.
+    action :restart
+  end
+  execute 'curl 0.0.0.0/healthcheck' # Make sure Passenger has actually started and is serving things.
+  service 'delayed_job' do # Restart delayed_job to pick up any changes.
+    action [:enable, :restart]
+  end
+
 end
