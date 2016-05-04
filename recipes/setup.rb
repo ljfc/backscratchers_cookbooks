@@ -97,6 +97,10 @@ end
 
 package 'ghostscript' # Dragonfly gem uses this to make thumbnails from PDFs.
 package 'imagemagick' # Dragonfly gem uses this to make thumbnails. Install it after the above so it includes Ghostscript (this may not in fact be necessary, but hey-ho).
+template '/etc/ImageMagick/policy.xml' do # Restrict vulnerable coders, see https://imagetragick.com
+  source 'imagemagick_policy.xml.erb'
+  mode 0644
+end
 
 package 'awscli' # We need to interact with AWS for things like sharing letsencrypt credentials.
 directory '/root/.aws' do
