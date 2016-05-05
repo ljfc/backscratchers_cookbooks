@@ -115,3 +115,10 @@ aws_secret_access_key = #{secrets['s3_credentials']['secret_access_key']}
 }
   mode 0600
 end
+
+template '/home/ubuntu/.irbrc' do
+  source 'irbrc.erb'
+  mode 0644
+  owner 'ubuntu'
+  group 'ubuntu'
+end
