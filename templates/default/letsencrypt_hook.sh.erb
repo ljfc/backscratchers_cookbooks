@@ -38,6 +38,10 @@ function deploy_cert {
     date
 
     echo "About to push up cert for $DOMAIN"
+    echo "Temp files:"
+    echo "  Certificate: $CERTFILE"
+    echo "  Private key: $KEYFILE"
+    echo "  Chain file:  $CHAINFILE"
     echo "Cert will be called $DOMAIN-$TIMESTAMP"
 
     SERVER_CERTIFICATE=$(aws iam upload-server-certificate --server-certificate-name $DOMAIN-$TIMESTAMP --certificate-body file://$CERTFILE --private-key file://$KEYFILE --certificate-chain file://$CHAINFILE)

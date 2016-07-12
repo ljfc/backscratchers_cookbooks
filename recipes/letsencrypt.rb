@@ -30,8 +30,8 @@ if node.has_key?('letsencrypt') && instance['role'].include?('lead_server') # On
     command "aws s3 sync #{s3_uri} /etc/letsencrypt.sh"
   end
 
-  template  '/etc/letsencrypt.sh/config.sh' do # Configuration file.
-    source 'letsencrypt_config.sh.erb'
+  template  '/etc/letsencrypt.sh/config' do # Configuration file.
+    source 'letsencrypt_config.erb'
     variables({ letsencrypt: letsencrypt })
     mode 0700
   end

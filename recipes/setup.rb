@@ -106,11 +106,36 @@ package 'awscli' # We need to interact with AWS for things like sharing letsencr
 directory '/root/.aws' do
   mode 0700
 end
-file '/root/.aws/config' do
+# Credentials go in multiple locations to ensure different tools can find them, regardless of which user they are running under.
+file '/root/.aws/credentials' do
   content %Q{[default]
 aws_access_key_id = #{secrets['s3_credentials']['access_key_id']}
-output = json
+aws_secret_access_key = #{secrets['s3_credentials']['secret_access_key']}
+}
+end
+file '/root/.aws/config' do
+  content %Q{[default]
 region = #{secrets['s3_credentials']['region']}
+output = json
+aws_access_key_id = #{secrets['s3_credentials']['access_key_id']}
+aws_secret_access_key = #{secrets['s3_credentials']['secret_access_key']}
+}
+  mode 0600
+end
+directory '/home/ubuntu/.aws' do
+  mode 0700
+end
+file '/home/ubuntu/.aws/credentials' do
+  content %Q{[default]
+aws_access_key_id = #{secrets['s3_credentials']['access_key_id']}
+aws_secret_access_key = #{secrets['s3_credentials']['secret_access_key']}
+}
+end
+file '/home/ubuntu/.aws/config' do
+  content %Q{[default]
+region = #{secrets['s3_credentials']['region']}
+output = json
+aws_access_key_id = #{secrets['s3_credentials']['access_key_id']}
 aws_secret_access_key = #{secrets['s3_credentials']['secret_access_key']}
 }
   mode 0600
