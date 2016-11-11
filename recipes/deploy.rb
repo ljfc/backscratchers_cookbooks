@@ -21,7 +21,7 @@ application '/srv/backscratchers' do
 
   ruby 'backscratchers' do
     provider :ruby_build
-    version '2.1.3'
+    version '2.2.5'
   end
 
   git do

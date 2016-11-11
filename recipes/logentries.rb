@@ -19,7 +19,7 @@ apt_repository 'logentries' do # Add the Logentries APT repository.
   components ['main']
 
   keyserver 'pgp.mit.edu'
-  key 'C43C79AD'
+  key 'A5270289C43C79AD'
 end
 package 'logentries'
 package 'logentries-daemon'
