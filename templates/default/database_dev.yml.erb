@@ -1,0 +1,18 @@
+development:
+  adapter: mysql2
+  encoding: utf8
+  database: <%= @dev['database_name'] %>
+  pool: 5
+  username: <%= @dev['db_user'] %>
+  password: <%= @dev['db_password'] %>
+  host: <%= @dev['address'] %>
+
+test:
+  adapter: mysql2
+  encoding: utf8
+  database: <%= @test['database_name'] %>
+  pool: 5
+  username: <%= @test['db_user'] %>
+  password: <%= @test['db_password'] %>
+  host: <%= @test['address'] %>
+
