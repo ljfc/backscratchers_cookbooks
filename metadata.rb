@@ -1,9 +1,9 @@
 name 'bs'
 maintainer 'The Backscratchers'
-maintainer_email 'leo@thebackscratchers.com'
+maintainer_email 'admin@thebackscratchers.com'
 description 'Manages The Backscratchers infrastructure'
-long_description 'Manages infrastructure for The Backscratchers website on Amazon Web Services OpsWorks'
-version '1.2.0'
+long_description 'Manages infrastructure for The Backscratchers website on Amazon Web Services OpsWorks, and development environments using Vagrant on local VMs or on AWS'
+version '1.2.2'
 
 depends 'apt', '~> 3.0.0' # So we can update apt and install the latest packages.
 

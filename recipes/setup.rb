@@ -14,6 +14,8 @@ end
 
 include_recipe 'apt::default'
 
+package 'build-essential' # Needed for building other things, e.g. chruby.
+
 template '/etc/logrotate.d/backscratchers' do # Rotate our custom logs.
   source 'logrotate.erb'
   variables(environment: app['environment']['RAILS_ENV'])
